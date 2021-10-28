@@ -38,6 +38,8 @@ public class Main {
         }
 
         File programPlace = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+
+        // if it isn't a jar file, shouldn't be true when done in final jar
         if (programPlace.isDirectory())
             Game.testJsonPath = "C:\\Users\\Idris\\IdeaProjects\\platformer";
         else
