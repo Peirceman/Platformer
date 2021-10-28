@@ -1,6 +1,4 @@
-# Default ignored files
-/shelf/
-workspace.xml
+/.idea/
 
 # Ignore compilation output
 /out/
