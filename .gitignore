@@ -6,3 +6,6 @@ workspace.xml
 /out/
 *.class
 *.jar
+
+# Include libraries
+!/lib/*.jar
