@@ -17,7 +17,7 @@ import static javax.swing.SwingUtilities.invokeLater;
 
 public class Main {
 
-    static String location;
+    static String location = "center";
     static Window window;
     static List<String> locations = Stream.of("topLeft", "topCenter", "topRight", "centerLeft", "center",
                                               "centerRight", "bottomLeft", "bottomCenter", "bottomRight")
