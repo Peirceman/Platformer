@@ -3,6 +3,6 @@
 /workspace.xml
 
 # Ignore compilation output
-/out/artifacts
+/out/
 *.class
 *.jar
