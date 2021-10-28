@@ -1,0 +1,10 @@
+blocks:
+	25x25 mspaint
+	gewoon, dood, sticky, bomb
+
+Level editor:
+	click = block mouse x/y - (mouse X/Y % 25)
+	save games:
+		id, x, y
+
+	
