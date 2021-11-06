@@ -1,9 +1,6 @@
+# Ignore intellij stuff
 /.idea/
+*.iml
 
 # Ignore compilation output
 /out/
-*.class
-*.jar
-
-# Include libraries
-!/lib/*.jar
