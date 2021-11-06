@@ -8,6 +8,8 @@ import com.platformer.main.Window;
 import com.platformer.supers.GamePanel;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -55,5 +57,17 @@ public class Main {
         window.dispose();
         Game.currentLevel = level;
         invokeLater(() -> window = new Window(GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT, "platformer", new Game() , location));
+    }
+
+    @SuppressWarnings("unused")
+    public static long time(Object o, Method m, int amountOfTimes, Object... args)
+            throws InvocationTargetException, IllegalAccessException {
+        long start, end;
+        start = System.nanoTime();
+        for (int i = 0; i < amountOfTimes; i++) {
+            m.invoke(o, args);
+        }
+        end = System.nanoTime();
+        return end - start;
     }
 }
