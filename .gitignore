@@ -1,6 +1,6 @@
-# Ignore intellij stuff
-/.idea/
-*.iml
+# Default ignored files
+.idea/workspace.xml
+.idea/shelf/
 
 # Ignore compilation output
 /out/
