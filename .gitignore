@@ -1,6 +1,5 @@
 # Ignore intellij stuff
 /.idea/
-*.iml
 
 # Ignore compilation output
 /out/
