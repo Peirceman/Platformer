@@ -123,7 +123,7 @@ public class Player extends GameObject {
 		return touchesBlock;
 	}
 
-	private int blockCollision (int y, boolean goingDown) {
+	private int blockCollision(int y, boolean goingDown) {
 		// check for screen bounds
 		if (goingDown) {
 			if (y >= GamePanel.SCREEN_HEIGHT - GameObject.UNIT_SIZE)
@@ -184,8 +184,8 @@ public class Player extends GameObject {
 				return 0;
 			}
 		} else {
-			if (x >= GamePanel.SCREEN_WIDTH - GameObject.UNIT_SIZE) {
-				return GamePanel.SCREEN_WIDTH - GameObject.UNIT_SIZE;
+			if (x >= Game.levelWidth - GameObject.UNIT_SIZE) {
+				return Game.levelWidth - GameObject.UNIT_SIZE;
 			}
 		}
 

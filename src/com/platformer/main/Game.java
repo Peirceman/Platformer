@@ -1,5 +1,6 @@
 package com.platformer.main;
 
+import com.platformer.supers.GameObject;
 import com.platformer.supers.GamePanel;
 import com.platformer.util.Format;
 import com.platformer.util.JSONReader;
@@ -12,7 +13,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.util.Arrays;
 
 
 public class Game extends GamePanel implements Runnable {
@@ -24,16 +24,19 @@ public class Game extends GamePanel implements Runnable {
     private int startY                  = 0;
     private int gameState               = 1;                     // the state of the game
     public static int currentLevel      = 1;
-    public static final int xObjects    = GamePanel.SCREEN_WIDTH / 50;
     public static final int yObjects    = GamePanel.SCREEN_HEIGHT / 50;
-    public static final int gameObjects = xObjects * yObjects; // the amount of objects that can fit on the screen
     private boolean playing             = false;
     private boolean addedButton         = false;
     public static String testJsonPath   = "";                     // the path to the json witch contains all player levels
-    public static Block[] level         = new Block[gameObjects]; // an array of blocks where all the level is stored
     private final JButton respawnButton = new JButton();
     private Player player               = null;
     private boolean isPaused            = false;
+    private int cam                     = 0;
+    public static int levelWidth;
+    public static int xObjects;
+    public static int gameObjects; // the amount of objects that can fit on the screen
+    public static Block[] level;   // an array of blocks where all the level is stored
+    private int    maxCam;
     private double savedX;
     private double savedY;
 
@@ -76,7 +79,7 @@ public class Game extends GamePanel implements Runnable {
         public void mousePressed(MouseEvent e) {
             if (gameState == 1) return;
             try {
-                int x = getMousePosition().x - (getMousePosition().x % 50);
+                int x = getMousePosition().x - (getMousePosition().x % 50) + cam - (cam % 50);
                 int y = getMousePosition().y - (getMousePosition().y % 50);
 
                 Block block = new Block(id, x, y);
@@ -134,12 +137,14 @@ public class Game extends GamePanel implements Runnable {
 
     @Override
     protected void paintComponent(Graphics g) {
+        g.translate(-cam, 0);
         super.paintComponent(g);
         g.setColor(Color.white);
-        g.clearRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
-        Arrays.stream(level).forEach(block -> {
-            if (block != null) block.draw(g);
-        });
+        g.clearRect(0, 0, Game.levelWidth, GamePanel.SCREEN_HEIGHT);
+        for (Block block : Game.level) {
+            if (block != null && block.getX() + GameObject.UNIT_SIZE > cam && block.getX() < cam + GamePanel.SCREEN_WIDTH)
+                block.draw(g);
+        }
 
         if (player == null) return;
 
@@ -151,10 +156,15 @@ public class Game extends GamePanel implements Runnable {
     private void loadJson(String resource, String key, boolean absolutePath) {
         try {
             var loadedJSON = JSONReader.readFile(resource, absolutePath).getJSONObject(key);
-            level = JSONReader.JSONArrayToBlockArray(loadedJSON.getJSONArray("level"), Game.gameObjects);
-            player = new Player(loadedJSON.getInt("startX"), loadedJSON.getInt("startY"));
             startX = loadedJSON.getInt("startX");
             startY = loadedJSON.getInt("startY");
+            player = new Player(startX, startY);
+
+            levelWidth  = loadedJSON.getInt("width");
+            maxCam      = levelWidth - GamePanel.SCREEN_WIDTH;
+            xObjects    = levelWidth / 50;
+            gameObjects = xObjects * yObjects;
+            level       = JSONReader.JSONArrayToBlockArray(loadedJSON.getJSONArray("level"), Game.gameObjects);
         } catch (JSONException | IOException e) {
             System.err.println("fatal error occurred when reading file: " + resource);
             e.printStackTrace();
@@ -227,6 +237,8 @@ public class Game extends GamePanel implements Runnable {
             }
 
             if (deltaF >= 1) {
+                cam = (player.getX() - SCREEN_WIDTH / 2);
+                cam = Math.max(Math.min(cam, maxCam), 0);
                 repaint();
                 frames++;
                 deltaF--;
