@@ -23,12 +23,10 @@ public class Game extends GamePanel implements Runnable {
 
     public static final float TICKS     = 60.0f;                 // the amount of times the game ticks every second
     public static final int LEVELS      = 1;
-    private int id                      = 1;                     // the id for player-placed blocks
-    private int startX                  = 0;
-    private int startY                  = 0;
+    public static int yObjects          = GamePanel.SCREEN_HEIGHT / 50;
+    private int id                      = 1;
     private int gameState               = 1;                     // the state of the game
     public static int currentLevel      = 1;
-    public static final int yObjects    = GamePanel.SCREEN_HEIGHT / 50;
     private boolean playing             = false;
     private boolean addedButton         = false;
     public static String testJsonPath   = "";                     // the path to the json witch contains all player levels
@@ -36,10 +34,9 @@ public class Game extends GamePanel implements Runnable {
     private Player player               = null;
     private boolean isPaused            = false;
     private int cam                     = 0;
-    public static int levelWidth;
     public static int xObjects;
-    public static int gameObjects; // the amount of objects that can fit on the screen
-    public static Block[] level;   // an array of blocks where all the level is stored
+    public static int gameObjects;
+    public static Level level;
     private int    maxCam;
     private double savedX;
     private double savedY;
@@ -61,7 +58,7 @@ public class Game extends GamePanel implements Runnable {
             } else if (e.getKeyCode() == KeyEvent.VK_S && gameState == 2){
                 // saves the current level
                 try {
-                    JSONArray array   = JSONWriter.blockArrayToJSONArray(level);
+                    JSONArray array   = JSONWriter.blockArrayToJSONArray(Game.level.blocks());
                     JSONObject object = new JSONObject();
                     object.put("level", array);
                     JSONWriter.write(object);
@@ -81,13 +78,13 @@ public class Game extends GamePanel implements Runnable {
     class AL extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
-            if (gameState == 1) return;
+            if (gameState == 1 || addedButton) return;
             try {
                 int x = getMousePosition().x - (getMousePosition().x % 50) + cam - (cam % 50);
                 int y = getMousePosition().y - (getMousePosition().y % 50);
 
                 Block block = new Block(id, x, y);
-                level[block.getArrayIndex()] = level[block.getArrayIndex()] == null ? block : null;
+                level.blocks()[block.getArrayIndex()] = level.blocks()[block.getArrayIndex()] == null ? block : null;
             } catch (NullPointerException ignored){}
         }
     }
@@ -120,16 +117,17 @@ public class Game extends GamePanel implements Runnable {
 
         // initialize respawn button
         {
-            respawnButton.setFont(GamePanel.font);
-            respawnButton.setText("respawn");
-            respawnButton.setSize(225, 85);
-            respawnButton.setLocation((GamePanel.SCREEN_WIDTH - respawnButton.getWidth()) / 2,
+            this.respawnButton.setFont(GamePanel.font);
+            this.respawnButton.setText("respawn");
+            this.respawnButton.setSize(225, 85);
+            this.respawnButton.setLocation((GamePanel.SCREEN_WIDTH - respawnButton.getWidth()) / 2,
                     (GamePanel.SCREEN_HEIGHT + respawnButton.getHeight()) / 2);
-            respawnButton.setFocusable(false);
+            this.respawnButton.setFocusable(false);
 
-            respawnButton.addActionListener(e -> {
-                this.player = new Player(this.startX, this.startY);
+            this.respawnButton.addActionListener(e -> {
+                this.player = new Player(Game.level.startX(), Game.level.startY());
                 this.remove(respawnButton);
+                this.respawnButton.setLocation(respawnButton.getX() - cam, respawnButton.getY());
                 this.revalidate();
                 this.addedButton = false;
             });
@@ -144,8 +142,8 @@ public class Game extends GamePanel implements Runnable {
         g.translate(-cam, 0);
         super.paintComponent(g);
         g.setColor(Color.white);
-        g.clearRect(0, 0, Game.levelWidth, GamePanel.SCREEN_HEIGHT);
-        for (Block block : Game.level) {
+        g.clearRect(0, 0, Game.level.width(), GamePanel.SCREEN_HEIGHT);
+        for (Block block : Game.level.blocks()) {
             if (block != null && block.getX() + GameObject.UNIT_SIZE > cam && block.getX() < cam + GamePanel.SCREEN_WIDTH)
                 block.draw(g);
         }
@@ -154,21 +152,21 @@ public class Game extends GamePanel implements Runnable {
 
         player.draw(g);
 
-        if (player.isDead) playerDeath(g);
+        if (player.isDead) drawDeath(g);
     }
 
     private void loadJson(String resource, String key, boolean absolutePath) {
         try {
             var loadedJSON = JSONReader.readFile(resource, absolutePath).getJSONObject(key);
-            startX = loadedJSON.getInt("startX");
-            startY = loadedJSON.getInt("startY");
+            int startX = loadedJSON.getInt("startX");
+            int startY = loadedJSON.getInt("startY");
             player = new Player(startX, startY);
 
-            levelWidth  = loadedJSON.getInt("width");
-            maxCam      = levelWidth - GamePanel.SCREEN_WIDTH;
-            xObjects    = levelWidth / 50;
-            gameObjects = xObjects * yObjects;
-            level       = JSONReader.JSONArrayToBlockArray(loadedJSON.getJSONArray("level"), Game.gameObjects);
+            int width        = loadedJSON.getInt("width");
+            Game.xObjects    = width / 50;
+            Game.gameObjects = xObjects * Game.yObjects;
+            level            = new Level(startX, startY, width, JSONReader.JSONArrayToBlockArray(loadedJSON.getJSONArray("level"), Game.gameObjects));
+            maxCam           = Game.level.width() - GamePanel.SCREEN_WIDTH;
         } catch (JSONException | IOException e) {
             System.err.println("fatal error occurred when reading file: " + resource);
             e.printStackTrace();
@@ -176,19 +174,20 @@ public class Game extends GamePanel implements Runnable {
         }
     }
 
-    private void playerDeath(Graphics g) {
+    private void drawDeath(Graphics g) {
         // give screen red tint
         g.setColor(new Color(0x99FF0000, true));
-        g.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
+        g.fillRect(cam, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
 
         // write death text
         g.setColor(Color.BLACK);
         g.setFont(GamePanel.font);
-        g.drawString("u ded", (GamePanel.SCREEN_WIDTH - GamePanel.metrics.stringWidth("u ded")) / 2,
+        g.drawString("u ded", cam + (GamePanel.SCREEN_WIDTH - GamePanel.metrics.stringWidth("u ded")) / 2,
                 (GamePanel.SCREEN_HEIGHT - GamePanel.metrics.getHeight() / 2) / 2);
 
         // add respawn button if not already added
         if (!addedButton) {
+            respawnButton.setLocation(respawnButton.getX() + cam, respawnButton.getY());
             this.add(respawnButton);
             this.addedButton = true;
         }
