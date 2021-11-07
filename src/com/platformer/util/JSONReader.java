@@ -1,8 +1,7 @@
 package com.platformer.util;
 
-import com.platformer.main.Block;
 import com.platformer.Main;
-
+import com.platformer.main.Block;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,7 +10,6 @@ import org.json.JSONTokener;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
-import java.util.Arrays;
 
 public class JSONReader {
 
@@ -33,11 +31,10 @@ public class JSONReader {
 
 	public static Block[] JSONArrayToBlockArray(JSONArray array, int length) throws JSONException {
 		Block[] level = new Block[length];
-		Arrays.fill(level, null);
 
 		for (int i = 0; i < array.length(); i++) {
 			JSONObject obj = array.getJSONObject(i);
-			Block current = new Block(obj.getInt("id"), obj.getInt("x"), obj.getInt("y"));
+			Block current  = new Block(obj.getInt("id"), obj.getInt("x"), obj.getInt("y"));
 			level[current.getArrayIndex()] = current;
 		}
 

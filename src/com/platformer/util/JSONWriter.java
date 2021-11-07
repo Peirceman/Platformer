@@ -1,20 +1,17 @@
 package com.platformer.util;
 
 import com.platformer.main.Block;
-import com.platformer.main.Game;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.FileWriter;
+import java.io.IOException;
 
 public class JSONWriter {
  	
-	public static void write(JSONObject obj) throws IOException{
-		File file = new File(Game.testJsonPath);
-		FileWriter writer = new FileWriter(file);
+	public static void write(String resource, JSONObject obj) throws IOException{
+		FileWriter writer = new FileWriter(resource);
  	 	writer.write(obj.toString());
  	 	writer.close();
  	}

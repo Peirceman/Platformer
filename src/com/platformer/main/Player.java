@@ -14,7 +14,7 @@ public class Player extends GameObject {
 	double yVelocity = 0;
 	double xVelocity;
 
-	Player(int x, int y) {
+	public Player(int x, int y) {
 		super(x, y);
 		this.image = GameObject.textureMap.getSubimage(50, 50, 50, 50);
 	}
@@ -92,14 +92,14 @@ public class Player extends GameObject {
 		int idx;
 		{
 			int xIdx = (this.x - rmd50) / GameObject.UNIT_SIZE;
-			int yIdx = (y - (y % 50)) / GameObject.UNIT_SIZE * Game.xObjects + Game.xObjects;
+			int yIdx = (y - (y % 50)) / GameObject.UNIT_SIZE * Game.level.xObjects + Game.level.xObjects;
 			idx = xIdx + yIdx;
 		}
 
 		boolean touchesBlock = false, touchesSpike = false;
 
 		{
-			Block block = Game.level.blocks()[idx];
+			Block block = Game.level.blocks[idx];
 			if (block != null) {
 				if (block.getId() == 2) touchesSpike = true;
 
@@ -108,7 +108,7 @@ public class Player extends GameObject {
 		}
 
 		if (rmd50 != 0){
-			Block block = Game.level.blocks()[idx + 1];
+			Block block = Game.level.blocks[idx + 1];
 			if (block != null) {
 				if (block.getId() != 2)		touchesSpike = false;
 				else if (!touchesBlock) touchesSpike = true;
@@ -135,8 +135,8 @@ public class Player extends GameObject {
 		// set idx to the index a possibly colliding block
 		final int rmd50 =  this.x % 50;
 		final int xIdx = (this.x - rmd50) / GameObject.UNIT_SIZE;
-		final int yIdx = (y - (y % 50)) * Game.xObjects / GameObject.UNIT_SIZE;
-		int idx = xIdx + yIdx + (goingDown ? Game.xObjects : 0);
+		final int yIdx = (y - (y % 50)) * Game.level.xObjects / GameObject.UNIT_SIZE;
+		int idx = xIdx + yIdx + (goingDown ? Game.level.xObjects : 0);
 
 		// the y value that needs to be checked
 		int numToCheck = y + GameObject.UNIT_SIZE * (goingDown ? 1 : -1);
@@ -146,8 +146,8 @@ public class Player extends GameObject {
 		int collisionY = y;
 
 		// check for block in first possible position
-		if (Game.level.blocks()[idx] != null) {
-			Block block = Game.level.blocks()[idx];
+		if (Game.level.blocks[idx] != null) {
+			Block block = Game.level.blocks[idx];
 			if ((goingDown && numToCheck > block.getY()) || (!goingDown && numToCheck < block.getY())) {
 				collisionY = block.getY() + GameObject.UNIT_SIZE * (goingDown ? -1 : 1);
 				touchesBlock = true;
@@ -160,8 +160,8 @@ public class Player extends GameObject {
 		idx++;
 
 		// check for second position if the player is not perfectly aligned with the first block
-		if (idx < Game.level.blocks().length && Game.level.blocks()[idx] != null && rmd50 != 0) {
-			Block block = Game.level.blocks()[idx];
+		if (idx < Game.level.blocks.length && Game.level.blocks[idx] != null && rmd50 != 0) {
+			Block block = Game.level.blocks[idx];
 			if ((goingDown && numToCheck > block.getY()) || (!goingDown && numToCheck < block.getY())) {
 				collisionY = block.getY() + GameObject.UNIT_SIZE * (goingDown ? -1 : 1);
 				if (goingDown) {
@@ -184,15 +184,15 @@ public class Player extends GameObject {
 				return 0;
 			}
 		} else {
-			if (x >= Game.level.width() - GameObject.UNIT_SIZE) {
-				return Game.level.width() - GameObject.UNIT_SIZE;
+			if (x >= Game.level.width - GameObject.UNIT_SIZE) {
+				return Game.level.width - GameObject.UNIT_SIZE;
 			}
 		}
 
 		// variables used for checking
 		int rmd50 = super.y % 50;
 		final int xIdx = (x - (x % 50)) / 50;
-		final int yIdx = (super.y - rmd50) / 50 * Game.xObjects;
+		final int yIdx = (super.y - rmd50) / 50 * Game.level.xObjects;
 		int idx = xIdx + yIdx + (goingLeft ? 0 : 1);
 
 		// the x value that needs to be checked
@@ -202,8 +202,8 @@ public class Player extends GameObject {
 		int collisionX = x;
 
 		// check for block in first possible position
-		if (Game.level.blocks()[idx] != null) {
-			Block block = Game.level.blocks()[idx];
+		if (Game.level.blocks[idx] != null) {
+			Block block = Game.level.blocks[idx];
 			if ((goingLeft && numToCheck <= block.getX()) || (!goingLeft && numToCheck >= block.getX())) {
 				collisionX = block.getX() + GameObject.UNIT_SIZE * (goingLeft ? 1 : -1);
 				touchesBlock = true;
@@ -213,12 +213,12 @@ public class Player extends GameObject {
 			}
 		}
 
-		idx += Game.xObjects;
+		idx += Game.level.xObjects;
 
-		if (idx < Game.level.blocks().length) {
+		if (idx < Game.level.blocks.length) {
 			// check for second position if the player is not perfectly aligned with first block
-			if (Game.level.blocks()[idx] != null && rmd50 != 0) {
-				Block block = Game.level.blocks()[idx];
+			if (Game.level.blocks[idx] != null && rmd50 != 0) {
+				Block block = Game.level.blocks[idx];
 				if ((goingLeft && numToCheck <= block.getX()) || (!goingLeft && numToCheck >= block.getX())) {
 					collisionX = block.getX() + GameObject.UNIT_SIZE * (goingLeft ? 1 : -1);
 					if (goingLeft) {

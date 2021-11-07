@@ -1,3 +1,33 @@
 package com.platformer.main;
 
-public record Level(int startX, int startY, int width, Block[] blocks) {}
+import com.platformer.supers.GameObject;
+import com.platformer.supers.GamePanel;
+
+public class Level {
+    public static int yObjects = GamePanel.SCREEN_HEIGHT / 50;
+    public int startX;
+    public int startY;
+    public int width;
+    public int xObjects;
+    public Block[] blocks;
+
+    public Level(int startX, int startY, int width, int xObjects, Block[] blocks) {
+        if (blocks.length != xObjects * Level.yObjects)
+            throw new IllegalArgumentException("length of block array must be xObjects Level.yObjects");
+
+        this.startX = startX;
+        this.startY = startY;
+        this.width = width;
+        this.xObjects = xObjects;
+        this.blocks = blocks;
+    }
+
+    public Level() {
+        this(0, 0, 0, 0, new Block[0]);
+    }
+
+    public void setWidth(int width) {
+        this.width    = width;
+        this.xObjects = width/ GameObject.UNIT_SIZE;
+    }
+}
