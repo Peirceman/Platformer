@@ -4,7 +4,7 @@ import com.platformer.Main;
 import com.platformer.main.Game;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,14 +14,13 @@ public abstract class GameObject {
 	public static int UNIT_SIZE = 50;
 
 	protected int x, y;
-	protected BufferedImage image;
+	protected transient BufferedImage image;
 	protected static BufferedImage textureMap;
 	protected final double g =  50 / Game.TICKS;
 
 	static {
 		try {
 			InputStream is = Main.class.getResourceAsStream("/res/textures.png");
-
 			GameObject.textureMap = ImageIO.read(Objects.requireNonNull(is));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -51,9 +50,6 @@ public abstract class GameObject {
 
 	@Override
 	public String toString() {
-		return getClass().getName() + "[" +
-				"x=" + this.x +
-				", y=" + this.y +
-				"]";
+		return getClass().getName() + "[x=" + this.x + "x,y=" + this.y + ']';
 	}
 }
