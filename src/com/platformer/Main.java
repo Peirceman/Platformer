@@ -10,6 +10,8 @@ import com.platformer.supers.GamePanel;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -26,7 +28,7 @@ public class Main {
                                                   .map(l -> l.toLowerCase(Locale.ROOT)).toList();
                                                                 // all locations that can be supplied with the -l key
 
-    public static void main (String[] args) {
+    public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, URISyntaxException {
         Option[] options = new Option[] {
             new Option("location to place the screen when running :\n    " + withoutBraces(locations.toArray(new String[0])), "-l", "--location")};
         ArgParser parser = new ArgParser("Usage: platformer " + options[0].namesCombined("|") + " <String location>]", options, "-h", "--help");
@@ -39,20 +41,13 @@ public class Main {
             location = givenLocation;
         }
 
-        File programPlace = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-
-        // if it isn't a jar file, shouldn't be true when done in final jar
-        if (programPlace.isDirectory())
-            Game.testJsonPath = "C:\\Users\\Idris\\IdeaProjects\\platformer";
-        else
-            Game.testJsonPath = programPlace.getParent();
-
-        Game.testJsonPath += System.getProperty("file.separator") + "test.json";
+        Game.playerLevels = Paths.get(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent(),"my.lev")
+                .toString();
 
         invokeLater(() -> window = new Window(GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT, "platformer", new Menu(), location));
     }
 
-    public static void addGame(int level) {
+    public static void addGame(String level) {
         window.clearSocket();
         window.dispose();
         Game.currentLevel = level;

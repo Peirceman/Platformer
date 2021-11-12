@@ -6,6 +6,15 @@ public class Block extends GameObject {
 	private final int id;
 	private final int arrayIndex;
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + "[" +
+				"x=" + x +
+				",y=" + y +
+				",id=" + id +
+				",arrayIndex=" + arrayIndex +
+				']';
+	}
 
 	public Block(int id, int x, int y) {
 		super(x, y);
@@ -17,10 +26,10 @@ public class Block extends GameObject {
 	}
 
 	public int getArrayIndex() {
-		return arrayIndex;
+		return this.arrayIndex;
 	}
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 }

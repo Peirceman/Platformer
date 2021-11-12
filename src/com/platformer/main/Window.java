@@ -81,7 +81,6 @@ public class Window extends JFrame{
 					g.clearPlayerSpeed();
 			}
 		});
-
 		this.setVisible(true);
 
 		panel.start();

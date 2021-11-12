@@ -24,16 +24,16 @@ public class Game extends GamePanel implements Runnable {
     public static final int LEVELS      = 1;
     private int id                      = 1;
     private int gameState               = 1;                     // the state of the game
-    public static int currentLevel      = 1;
     private boolean playing             = false;
     private boolean addedButton         = false;
-    public static String testJsonPath   = "";                     // the path to the json witch contains all player levels
+    public static String playerLevels = "";                     // the path to the json witch contains all player levels
     private final JButton respawnButton = new JButton();
-    private Player player               = null;
+    private static Player player        = null;
     private boolean isPaused            = false;
     private int cam                     = 0;
     public static Level level           = new Level();
-    private int    maxCam;
+    public static String currentLevel;
+    private static int maxCam;
     private double savedX;
     private double savedY;
 
@@ -47,16 +47,16 @@ public class Game extends GamePanel implements Runnable {
                 if (gameState == 1)
                     // convert player level to game level
                 {
-                    loadLevel("/res/levels.json", "level" + currentLevel, false);
+                    loadLevel("/res/levels.json", currentLevel, false);
                 }
                 else
                     // convert game level to player level
                 {
-                    loadLevel(testJsonPath, "level", true);
+                    loadLevel(playerLevels, "level", true);
                 }
 
             } else if (e.getKeyCode() == KeyEvent.VK_S && gameState == 2){
-                saveLevel(Game.testJsonPath, "level");
+                saveLevel(Game.playerLevels, "level");
             } else if (e.getKeyCode() > '0' && e.getKeyCode() <= '9')
                 id = e.getKeyCode() - '0';
             else player.keyPressed(e);
@@ -76,7 +76,7 @@ public class Game extends GamePanel implements Runnable {
                 int y = getMousePosition().y - (getMousePosition().y % 50);
 
                 Block block = new Block(id, x, y);
-                Game.level.blocks[block.getArrayIndex()] = level.blocks[block.getArrayIndex()] == null ? block : null;
+                Game.level.blocks[block.getArrayIndex()] = Game.level.blocks[block.getArrayIndex()] == null ? block : null;
             } catch (NullPointerException ignored){}
         }
     }
@@ -117,7 +117,7 @@ public class Game extends GamePanel implements Runnable {
             this.respawnButton.setFocusable(false);
 
             this.respawnButton.addActionListener(e -> {
-                this.player = new Player(Game.level.startX, Game.level.startY);
+                Game.player = new Player(Game.level.startX, Game.level.startY);
                 this.remove(respawnButton);
                 this.respawnButton.setLocation(respawnButton.getX() - cam, respawnButton.getY());
                 this.revalidate();
@@ -126,7 +126,7 @@ public class Game extends GamePanel implements Runnable {
         }
 
         // initialize level
-        loadLevel("/res/levels.json", "level" + currentLevel, false);
+        loadLevel("/res/levels.json", currentLevel, false);
     }
 
     @Override
@@ -166,13 +166,12 @@ public class Game extends GamePanel implements Runnable {
         }
     }
 
-    private void saveLevel(String resource, String key) {
+    public static void saveLevel(String resource, String key) {
         try {
             JSONObject levelObj = new JSONObject();
             levelObj.put("startX"  , Game.level.startX);
             levelObj.put("startY"  , Game.level.startY);
             levelObj.put("width"   , Game.level.width);
-            levelObj.put("xObjects", Game.level.xObjects);
             levelObj.put("blocks"  , JSONWriter.blockArrayToJSONArray(Game.level.blocks));
             JSONWriter.write(resource, JSONReader.readFile(resource, true).put(key, levelObj));
         } catch (IOException | JSONException e) {
@@ -181,16 +180,16 @@ public class Game extends GamePanel implements Runnable {
         }
     }
 
-    private void loadLevel(String resource, String key, boolean absolutePath) {
+    public static void loadLevel(String resource, String key, boolean absolutePath) {
         try {
             JSONObject levelObj = JSONReader.readFile(resource, absolutePath).getJSONObject(key);
             Game.level.startX = levelObj.getInt("startX");
             Game.level.startY = levelObj.getInt("startY");
             Game.level.setWidth(levelObj.getInt("width"));
             Game.level.blocks = JSONReader.JSONArrayToBlockArray(levelObj.getJSONArray("blocks"),
-                                                           Game.level.xObjects * Level.yObjects);
-            player = new Player(Game.level.startX, Game.level.startY);
-            maxCam = Game.level.width - GamePanel.SCREEN_WIDTH;
+                                                           (Game.level.width / GameObject.UNIT_SIZE) * Level.yObjects);
+            Game.player = new Player(Game.level.startX, Game.level.startY);
+            Game.maxCam = Game.level.width - GamePanel.SCREEN_WIDTH;
         } catch (JSONException | IOException e) {
             System.err.println("fatal error occurred when reading file: " + resource);
             e.printStackTrace();

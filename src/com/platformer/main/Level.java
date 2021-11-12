@@ -12,9 +12,6 @@ public class Level {
     public Block[] blocks;
 
     public Level(int startX, int startY, int width, int xObjects, Block[] blocks) {
-        if (blocks.length != xObjects * Level.yObjects)
-            throw new IllegalArgumentException("length of block array must be xObjects Level.yObjects");
-
         this.startX = startX;
         this.startY = startY;
         this.width = width;
@@ -23,7 +20,7 @@ public class Level {
     }
 
     public Level() {
-        this(0, 0, 0, 0, new Block[0]);
+        this(0, 0, 0, 0, null);
     }
 
     public void setWidth(int width) {
