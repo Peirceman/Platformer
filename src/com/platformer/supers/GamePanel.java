@@ -10,11 +10,14 @@ public abstract class GamePanel extends JPanel {
     public static final int SCREEN_HEIGHT = 600;
     protected static Font font = new Font("Comic sans ms", Font.BOLD, 40);
     protected static FontMetrics metrics = null;
+    protected static int FONT_HEIGHT;
 
     public GamePanel() {
         super(true);
-        if (metrics == null)
+        if (metrics == null) {
             metrics = getFontMetrics(font);
+            FONT_HEIGHT = metrics.getHeight();
+        }
     }
 
     public abstract void start();

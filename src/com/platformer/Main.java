@@ -7,11 +7,13 @@ import com.platformer.main.Menu;
 import com.platformer.main.Window;
 import com.platformer.supers.GamePanel;
 
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -20,7 +22,21 @@ import static com.platformer.util.Format.withoutBraces;
 import static javax.swing.SwingUtilities.invokeLater;
 
 public class Main {
+    public static final File playerLevelsDir;
 
+    static {
+        String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+        if (os.contains("win")) {
+            playerLevelsDir = new File(System.getenv("APPDATA") + "\\platformer");
+        } else if (os.contains("nux") | os.contains("nix") | os.contains("aix") | os.contains("mac")) {
+            playerLevelsDir = new File(System.getenv("user.home") + "/.platformer");
+        } else {
+            throw new Error("Unknown os");
+        }
+
+        if (playerLevelsDir.mkdirs())
+            System.out.println("creating " + playerLevelsDir.getPath());
+    }
     static String location = "center";
     static Window window;
     static List<String> locations = Stream.of("topLeft", "topCenter", "topRight", "centerLeft", "center",
@@ -28,7 +44,8 @@ public class Main {
                                                   .map(l -> l.toLowerCase(Locale.ROOT)).toList();
                                                                 // all locations that can be supplied with the -l key
 
-    public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, URISyntaxException {
+    public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, URISyntaxException, UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         Option[] options = new Option[] {
             new Option("location to place the screen when running :\n    " + withoutBraces(locations.toArray(new String[0])), "-l", "--location")};
         ArgParser parser = new ArgParser("Usage: platformer " + options[0].namesCombined("|") + " <String location>]", options, "-h", "--help");
@@ -41,17 +58,18 @@ public class Main {
             location = givenLocation;
         }
 
-        Game.playerLevels = Paths.get(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent(),"my.lev")
-                .toString();
-
         invokeLater(() -> window = new Window(GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT, "platformer", new Menu(), location));
     }
 
     public static void addGame(String level) {
-        window.clearSocket();
+        Game.editing = !(level.toCharArray()[0] >= '0' & level.toCharArray()[0] <= '9');
         window.dispose();
         Game.currentLevel = level;
         invokeLater(() -> window = new Window(GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT, "platformer", new Game() , location));
+    }
+
+    public static String getPlayerLevelPath(String level) {
+        return Path.of(playerLevelsDir.getPath(), level + ".lev").toString();
     }
 
     @SuppressWarnings("unused")

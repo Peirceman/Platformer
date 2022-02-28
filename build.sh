@@ -1,13 +1,23 @@
 #!/bin/sh
-mkdir -p out/production/platformer
-mkdir -p out/artifacts/platformer_jar
-cp -r res out/production/platformer
-javac -cp "lib/ArgParser.jar;lib/java-json.jar" --source-path src -d out/production/platformer src/com/platformer/Main.java
-mkdir lib/exploded
-cd lib/exploded
-jar -xf ../ArgParser.jar
-jar -xf ../java-json.jar
-cd ../..
-cp my.lev out/artifacts/platformer_jar
-jar -cmvf src/META-INF/MANIFEST.MF out/artifacts/platformer_jar/platformer.jar -C out/production/platformer . -C lib/exploded .
-rm -r lib/exploded
+
+set -e
+
+if [ ! -e out ];then
+	mkdir -p out/production/platformer
+	mkdir -p out/artifacts/platformer_jar
+fi
+
+javac -p lib --source-path src -d out/production/platformer src/com/platformer/Main.java src/module-info.java
+jar -c -f out/artifacts/platformer_jar/platformer.jar -e com.platformer.Main -C . res -C out/production/platformer .
+
+if [ -z ${1+x} ];then
+	exit
+fi
+
+if [ "$1" = "package" ];then
+	shift
+	jpackage "$@" --resource-dir res -n platformer -p out/artifacts/platformer_jar:lib -m platformer/com.platformer.Main
+	exit
+fi
+
+echo unknown arg $1 >&2

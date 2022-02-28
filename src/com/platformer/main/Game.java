@@ -1,5 +1,6 @@
 package com.platformer.main;
 
+import com.platformer.Main;
 import com.platformer.supers.GameObject;
 import com.platformer.supers.GamePanel;
 import com.platformer.util.Format;
@@ -16,17 +17,16 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.stream.IntStream;
 
 
 public class Game extends GamePanel implements Runnable {
-
-    public static final float TICKS     = 60.0f;                 // the amount of times the game ticks every second
+    public static final float TICKS     = 60.0f; // the amount of times the game ticks every second
     public static final int LEVELS      = 1;
     private int id                      = 1;
-    private int gameState               = 1;                     // the state of the game
+    public static boolean editing       = false; // the state of the game
     private boolean playing             = false;
     private boolean addedButton         = false;
-    public static String playerLevels = "";                     // the path to the json witch contains all player levels
     private final JButton respawnButton = new JButton();
     private static Player player        = null;
     private boolean isPaused            = false;
@@ -40,25 +40,11 @@ public class Game extends GamePanel implements Runnable {
     class KL extends KeyAdapter {
 
         public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_E) {
-                // change the game state
-                gameState = gameState == 1 ? 2 : 1;
-
-                if (gameState == 1)
-                    // convert player level to game level
-                {
-                    loadLevel("/res/levels.json", currentLevel, false);
-                }
-                else
-                    // convert game level to player level
-                {
-                    loadLevel(playerLevels, "level", true);
-                }
-
-            } else if (e.getKeyCode() == KeyEvent.VK_S && gameState == 2){
-                saveLevel(Game.playerLevels, "level");
-            } else if (e.getKeyCode() > '0' && e.getKeyCode() <= '9')
+            if (editing && e.getKeyCode() == KeyEvent.VK_S){
+                saveLevel(Main.getPlayerLevelPath(currentLevel), "level");
+            } else if (e.getKeyCode() > '0' && e.getKeyCode() <= '9') {
                 id = e.getKeyCode() - '0';
+            }
             else player.keyPressed(e);
         }
 
@@ -70,7 +56,7 @@ public class Game extends GamePanel implements Runnable {
     class AL extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
-            if (gameState == 1 || addedButton) return;
+            if (editing || addedButton) return;
             try {
                 int x = getMousePosition().x - (getMousePosition().x % 50) + cam - (cam % 50);
                 int y = getMousePosition().y - (getMousePosition().y % 50);
@@ -87,6 +73,7 @@ public class Game extends GamePanel implements Runnable {
         player.update();
     }
 
+
     @Override
     public synchronized void start() {
         this.playing = true;
@@ -101,6 +88,7 @@ public class Game extends GamePanel implements Runnable {
             this.setSize(GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
             this.setLocation(0, 0);
             this.setBackground(Color.white);
+            this.setIgnoreRepaint(true);
             this.setFocusable(true);
             this.addKeyListener(new KL());
             this.addMouseListener(new AL());
@@ -126,15 +114,14 @@ public class Game extends GamePanel implements Runnable {
         }
 
         // initialize level
-        loadLevel("/res/levels.json", currentLevel, false);
+        loadLevel(editing ? Main.getPlayerLevelPath(currentLevel) : "/res/levels.lev", currentLevel, editing);
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        g.translate(-cam, 0);
         super.paintComponent(g);
+        g.translate(-cam, 0);
         g.setColor(Color.white);
-        g.clearRect(0, 0, Game.level.width, GamePanel.SCREEN_HEIGHT);
         for (Block block : Game.level.blocks) {
             if (block != null && block.getX() + GameObject.UNIT_SIZE > cam && block.getX() < cam + GamePanel.SCREEN_WIDTH)
                 block.draw(g);
@@ -155,7 +142,8 @@ public class Game extends GamePanel implements Runnable {
         // write death text
         g.setColor(Color.BLACK);
         g.setFont(GamePanel.font);
-        g.drawString("u ded", cam + (GamePanel.SCREEN_WIDTH - GamePanel.metrics.stringWidth("u ded")) / 2,
+        String deathString = "yuo ded";
+        g.drawString(deathString, cam + (GamePanel.SCREEN_WIDTH - GamePanel.metrics.stringWidth(deathString)) / 2,
                 (GamePanel.SCREEN_HEIGHT - GamePanel.metrics.getHeight() / 2) / 2);
 
         // add respawn button if not already added
@@ -252,10 +240,14 @@ public class Game extends GamePanel implements Runnable {
             }
 
             if (System.currentTimeMillis() - timer > 1000) {
-                System.out.printf("\rtps: %s | fps: %s", ticks, Format.formatInt(frames));
+                System.out.printf("tps: %s | fps: %s\r", ticks, Format.formatInt(frames));
                 ticks  = frames = 0;
                 timer += 1000;
             }
+
+            try {
+                    Thread.sleep(0);
+            } catch (InterruptedException ignored) {}
         }
     }
 }
