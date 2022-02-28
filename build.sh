@@ -16,7 +16,7 @@ fi
 
 if [ "$1" = "package" ];then
 	shift
-	jpackage "$@" --resource-dir res -n platformer -p out/artifacts/platformer_jar:lib -m platformer/com.platformer.Main
+	jpackage "$@" --license-file LICENSE --resource-dir res -n platformer -p out/artifacts/platformer_jar:lib -m platformer/com.platformer.Main
 	exit
 fi
 

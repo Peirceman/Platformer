@@ -17,15 +17,15 @@ set first_arg=%1
 set args=""
 shift
 :parse
-if "%~1" neq "" (
-	set args="!args:~1,-1! %~1"
-	shift
-	goto :parse
-)
-set args=!args:~2,-1!
+	if "%~1" neq "" (
+		set args="!args:~1,-1! %~1"
+		shift
+		goto :parse
+	)
+	set args=!args:~2,-1!
 
 if %first_arg% == package (
-	jpackage !args! --resource-dir res -n platformer -p out\artifacts\platformer_jar;lib -m platformer/com.platformer.Main
+	jpackage !args! --win-console --win-shortcut-prompt --win-menu --win-dir-chooser --license-file LICENSE --resource-dir res -n platformer -p out\artifacts\platformer_jar;lib -m platformer/com.platformer.Main
 	exit /b
 )
 
