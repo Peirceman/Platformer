@@ -17,7 +17,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.stream.IntStream;
 
 
 public class Game extends GamePanel implements Runnable {
@@ -199,6 +198,7 @@ public class Game extends GamePanel implements Runnable {
     }
 
     @Override
+    @SuppressWarnings("all")
     public void run() {
 
         long now;
@@ -246,7 +246,7 @@ public class Game extends GamePanel implements Runnable {
             }
 
             try {
-                    Thread.sleep(0);
+                Thread.sleep(0);
             } catch (InterruptedException ignored) {}
         }
     }

@@ -16,7 +16,8 @@ fi
 
 if [ "$1" = "package" ];then
 	shift
-	jpackage "$@" --license-file LICENSE --resource-dir res -n platformer -p out/artifacts/platformer_jar:lib -m platformer/com.platformer.Main
+	now=$(date +%y.%m.%d%H%M)
+	jpackage "$@" --app-version ${now:0:11} --license-file LICENSE --resource-dir res -n platformer -p out/artifacts/platformer_jar:lib -m platformer/com.platformer.Main
 	exit
 fi
 

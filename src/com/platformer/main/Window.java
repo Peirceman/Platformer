@@ -17,7 +17,7 @@ import static java.awt.Toolkit.getDefaultToolkit;
 
 public class Window extends JFrame{
 
-	ServerSocket socket;
+	ServerSocket socket = null;
 	@SuppressWarnings("unused")
 	public Window(int width, int height, String title, GamePanel panel) {
 		this(width, height, title, panel, "center");
@@ -25,12 +25,12 @@ public class Window extends JFrame{
 
 	public Window(int width, int height, String title, GamePanel panel, String location) {
 		// check game is only started once
-//		try {
-//			socket = new ServerSocket(48103);
-//		} catch (IOException e) {
-//			System.err.println("Game has already started");
-//			System.exit(1);
-//		}
+		try {
+			socket = new ServerSocket(48103);
+		} catch (IOException e) {
+			System.err.println("Game has already started");
+			System.exit(1);
+		}
 
 		this.setTitle(title);
 		this.pack();
@@ -88,10 +88,10 @@ public class Window extends JFrame{
 
 	@Override
 	public void dispose() {
-		if (socket != null)
+		super.dispose();
+		System.out.println("dispoes")
 		try {
 			socket.close();
 		} catch (IOException ignored) {}
-		super.dispose();
 	}
 }

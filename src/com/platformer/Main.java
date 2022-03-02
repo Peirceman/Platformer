@@ -41,10 +41,9 @@ public class Main {
     static Window window;
     static List<String> locations = Stream.of("topLeft", "topCenter", "topRight", "centerLeft", "center",
                                               "centerRight", "bottomLeft", "bottomCenter", "bottomRight")
-                                                  .map(l -> l.toLowerCase(Locale.ROOT)).toList();
-                                                                // all locations that can be supplied with the -l key
+                                                  .map(l -> l.toLowerCase(Locale.ROOT)).toList(); // all locations that can be supplied with the -l key
 
-    public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, URISyntaxException, UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException {
+    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         Option[] options = new Option[] {
             new Option("location to place the screen when running :\n    " + withoutBraces(locations.toArray(new String[0])), "-l", "--location")};

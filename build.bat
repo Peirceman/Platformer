@@ -25,12 +25,13 @@ shift
 	set args=!args:~2,-1!
 
 if %first_arg% == package (
-	jpackage !args! --win-console --win-shortcut-prompt --win-menu --win-dir-chooser --license-file LICENSE --resource-dir res -n platformer -p out\artifacts\platformer_jar;lib -m platformer/com.platformer.Main
+	jpackage !args! --win-shortcut-prompt --win-menu --win-dir-chooser --app-version %date:~-2%.%date:~-7,2%.%date:~-10,2%%time:~0,2%%time:~3,1% --license-file LICENSE --resource-dir res -n platformer -p out\artifacts\platformer_jar;lib -m platformer/com.platformer.Main
 	exit /b
 )
 
 >&2 echo unknown arg %first_arg%
 
 endlocal
+
 
 
