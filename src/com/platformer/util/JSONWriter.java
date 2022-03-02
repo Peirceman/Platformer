@@ -16,37 +16,6 @@ public class JSONWriter {
  	 	writer.close();
  	}
 
- 	/*static public String formatJson(String Json) {
- 	 	int amountOfTabs = 0;
- 	 	StringBuilder str = new StringBuilder(Json);
-
- 	 	for (int i = 0; i < str.length(); i++) {
-			char current = str.charAt(i);
-			switch (current) {
-				case '{', '[' -> {
-					amountOfTabs++;
-					str.replace(i, i + 1, current + "\n" + "\t".repeat(amountOfTabs));
-					i += amountOfTabs + 1;
-				}
-				case '}', ']' -> {
-					amountOfTabs--;
-					str.replace(i, i + 1, "\n" + "\t".repeat(amountOfTabs) + current);
-					i += amountOfTabs + 1;
-				}
-				case ',' -> {
-					str.replace(i, i + 1, ",\n" + "\t".repeat(amountOfTabs));
-					i += amountOfTabs + +1;
-				}
-				case ':' -> {
-					str.replace(i, i + 1, " : ");
-					i += 2;
-				}
-			}
-		}
-
- 	 	return str.toString();
- 	}*/
-
  	public static JSONArray blockArrayToJSONArray(Block[] array) throws JSONException{
  	 	JSONArray jArray = new JSONArray();
 

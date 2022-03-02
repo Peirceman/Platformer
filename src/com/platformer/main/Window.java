@@ -17,7 +17,7 @@ import static java.awt.Toolkit.getDefaultToolkit;
 
 public class Window extends JFrame{
 
-	ServerSocket socket;
+	ServerSocket socket = null;
 	@SuppressWarnings("unused")
 	public Window(int width, int height, String title, GamePanel panel) {
 		this(width, height, title, panel, "center");
@@ -86,7 +86,10 @@ public class Window extends JFrame{
 		panel.start();
 	}
 
-	public void clearSocket() {
+	@Override
+	public void dispose() {
+		super.dispose();
+		System.out.println("dispoes")
 		try {
 			socket.close();
 		} catch (IOException ignored) {}

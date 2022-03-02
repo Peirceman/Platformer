@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class Format {
 	public static String formatInt(String number) {
-		if (!number.matches("\\d+")) throw new IllegalArgumentException("must be valid integer, without commas");
+		if (!number.matches("\\d+")) throw new IllegalArgumentException("must be valid integer");
 		StringBuilder newNumber = new StringBuilder();
 
 		for (int i = number.length(); i >= 0;) {
