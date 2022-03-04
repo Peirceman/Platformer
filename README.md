@@ -7,4 +7,3 @@ A platforming game i'm making.
 
 ## Uses:
 - [json](https:://json-en.html) parsing library from <https://github.com/stleary/JSON-java>
-- a simple commandline arguments parsing library I made

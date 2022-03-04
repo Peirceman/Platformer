@@ -1,7 +1,5 @@
 package com.platformer;
 
-import com.args.ArgParser;
-import com.args.Option;
 import com.platformer.main.Game;
 import com.platformer.main.Menu;
 import com.platformer.main.Window;
@@ -47,26 +45,14 @@ public class Main {
     public static void main(String[] args)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        Option[] options = new Option[] {
-            new Option("location to place the screen when running :\n    " + withoutBraces(locations.toArray(new String[0])), "-l", "--location")};
-        ArgParser parser = new ArgParser("Usage: platformer " + options[0].namesCombined("|") + " <String location>]", options, "-h", "--help");
-        parser.parse(args);
-        if (parser.hasValue(options[0])) {
-            String givenLocation = parser.getString(options[0]);
-            if (!locations.contains(givenLocation.toLowerCase(Locale.ROOT)))
-                parser.printError("Error: invalid location '" + location + "'");
-
-            location = givenLocation;
-        }
-
-        invokeLater(() -> window = new Window(GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT, "platformer", new Menu(), location));
+        invokeLater(() -> window = new Window(GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT, "platformer", new Menu()));
     }
 
     public static void addGame(String level) {
         Game.editing = !(level.toCharArray()[0] >= '0' && level.toCharArray()[0] <= '9');
         Game.currentLevel = level;
         window.dispose();
-        invokeLater(() -> window = new Window(GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT, "platformer", new Game() , location));
+        invokeLater(() -> window = new Window(GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT, "platformer", new Game()));
     }
 
     public static String getPlayerLevelPath(String level) {

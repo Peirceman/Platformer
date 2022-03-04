@@ -18,12 +18,8 @@ import static java.awt.Toolkit.getDefaultToolkit;
 public class Window extends JFrame{
 
 	ServerSocket socket = null;
-	@SuppressWarnings("unused")
-	public Window(int width, int height, String title, GamePanel panel) {
-		this(width, height, title, panel, "center");
-	}
 
-	public Window(int width, int height, String title, GamePanel panel, String location) {
+	public Window(int width, int height, String title, GamePanel panel) {
 		// check game is only started once
 		try {
 			socket = new ServerSocket(48103);
@@ -51,23 +47,6 @@ public class Window extends JFrame{
 		this.add(panel);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setResizable(false);
-
-		// set location to what was requested
-		location = location.toLowerCase(Locale.ROOT);
-		Dimension defaultD = getDefaultToolkit().getScreenSize();
-		if (location.contains("center"))
-			this.setLocationRelativeTo(null);
-
-		if (location.contains("left"))
-			this.setLocation(0, this.getY());
-		else if (location.contains("right"))
-			this.setLocation(defaultD.width - this.getWidth(), this.getY());
-
-		if (location.contains("top"))
-			this.setLocation(this.getX(), 0);
-		else if (location.contains("bottom"))
-			this.setLocation(this.getX(), defaultD.height - this.getHeight() - 35);
-
 
 		this.addWindowListener(new WindowAdapter() {
 			@Override
