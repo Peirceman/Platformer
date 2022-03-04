@@ -5,7 +5,9 @@ if not exist out (
 	mkdir out\artifacts\platformer_jar
 )
 
-javac -p lib --source-path src -d out\production\platformer src\com\platformer\Main.java src\module-info.java | exit
+dir *.java /B /S > sources.txt
+
+javac -Xlint:all -Xlint:-serial -p lib -d out\production\platformer @sources.txt || exit
 jar -c -f out\artifacts\platformer_jar\platformer.jar -e com.platformer.Main -C . res -C out\production\platformer .
 
 if "%1" == "" (

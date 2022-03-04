@@ -34,8 +34,9 @@ public class Main {
             throw new Error("Unknown os");
         }
 
-        if (playerLevelsDir.mkdirs())
+        if (playerLevelsDir.mkdirs()) {
             System.out.println("creating " + playerLevelsDir.getPath());
+		}
     }
     static String location = "center";
     static Window window;
@@ -43,7 +44,8 @@ public class Main {
                                               "centerRight", "bottomLeft", "bottomCenter", "bottomRight")
                                                   .map(l -> l.toLowerCase(Locale.ROOT)).toList(); // all locations that can be supplied with the -l key
 
-    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+    public static void main(String[] args)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         Option[] options = new Option[] {
             new Option("location to place the screen when running :\n    " + withoutBraces(locations.toArray(new String[0])), "-l", "--location")};
@@ -61,9 +63,9 @@ public class Main {
     }
 
     public static void addGame(String level) {
-        Game.editing = !(level.toCharArray()[0] >= '0' & level.toCharArray()[0] <= '9');
-        window.dispose();
+        Game.editing = !(level.toCharArray()[0] >= '0' && level.toCharArray()[0] <= '9');
         Game.currentLevel = level;
+        window.dispose();
         invokeLater(() -> window = new Window(GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT, "platformer", new Game() , location));
     }
 

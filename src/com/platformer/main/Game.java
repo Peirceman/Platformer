@@ -1,5 +1,15 @@
 package com.platformer.main;
 
+import java.io.IOException;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JButton;
+
 import com.platformer.Main;
 import com.platformer.supers.GameObject;
 import com.platformer.supers.GamePanel;
@@ -9,43 +19,38 @@ import com.platformer.util.JSONWriter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.swing.JButton;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-
 
 public class Game extends GamePanel implements Runnable {
     public static final float TICKS     = 60.0f; // the amount of times the game ticks every second
     public static final int LEVELS      = 1;
-    private int id                      = 1;
-    public static boolean editing       = false; // the state of the game
-    private boolean playing             = false;
-    private boolean addedButton         = false;
-    private final JButton respawnButton = new JButton();
-    private static Player player        = null;
-    private boolean isPaused            = false;
-    private int cam                     = 0;
     public static Level level           = new Level();
+    public static boolean editing       = false;
     public static String currentLevel;
+
+    private static Player player        = null;
     private static int maxCam;
+
+    private final JButton respawnButton = new JButton();
+
+    private boolean addedButton         = false;
+    private boolean isPaused            = false;
+    private boolean playing             = false;
     private double savedX;
     private double savedY;
+    private int cam                     = 0;
+    private int id                      = 1;
 
     class KL extends KeyAdapter {
 
-        public void keyPressed(KeyEvent e) {
-            if (editing && e.getKeyCode() == KeyEvent.VK_S){
-                saveLevel(Main.getPlayerLevelPath(currentLevel), "level");
-            } else if (e.getKeyCode() > '0' && e.getKeyCode() <= '9') {
-                id = e.getKeyCode() - '0';
-            }
-            else player.keyPressed(e);
-        }
+		public void keyPressed(KeyEvent e) {
+			if (editing) {
+				if (e.getKeyCode() == KeyEvent.VK_S) {
+				saveLevel(Main.getPlayerLevelPath(currentLevel), "level");
+				} else if (e.getKeyCode() > '0' && e.getKeyCode() <= '9') {
+					id = e.getKeyCode() - '0';
+				}
+			} else player.keyPressed(e);
+		}
 
         public void keyReleased(KeyEvent e) {
             player.keyReleased(e);
@@ -55,7 +60,7 @@ public class Game extends GamePanel implements Runnable {
     class AL extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
-            if (editing || addedButton) return;
+            if (!editing || addedButton) return;
             try {
                 int x = getMousePosition().x - (getMousePosition().x % 50) + cam - (cam % 50);
                 int y = getMousePosition().y - (getMousePosition().y % 50);
@@ -170,11 +175,14 @@ public class Game extends GamePanel implements Runnable {
     public static void loadLevel(String resource, String key, boolean absolutePath) {
         try {
             JSONObject levelObj = JSONReader.readFile(resource, absolutePath).getJSONObject(key);
+
             Game.level.startX = levelObj.getInt("startX");
             Game.level.startY = levelObj.getInt("startY");
             Game.level.setWidth(levelObj.getInt("width"));
+
             Game.level.blocks = JSONReader.JSONArrayToBlockArray(levelObj.getJSONArray("blocks"),
-                                                           (Game.level.width / GameObject.UNIT_SIZE) * Level.yObjects);
+					(Game.level.width / GameObject.UNIT_SIZE) * Level.yObjects);
+
             Game.player = new Player(Game.level.startX, Game.level.startY);
             Game.maxCam = Game.level.width - GamePanel.SCREEN_WIDTH;
         } catch (JSONException | IOException e) {
@@ -200,7 +208,6 @@ public class Game extends GamePanel implements Runnable {
     @Override
     @SuppressWarnings("all")
     public void run() {
-
         long now;
         final double timeU = 1_000_000_000.0 / TICKS;
         final double timeF = 1_000_000_000.0 / 60.0;
@@ -251,3 +258,4 @@ public class Game extends GamePanel implements Runnable {
         }
     }
 }
+

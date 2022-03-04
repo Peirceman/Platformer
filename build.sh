@@ -7,7 +7,9 @@ if [ ! -e out ];then
 	mkdir -p out/artifacts/platformer_jar
 fi
 
-javac -p lib --source-path src -d out/production/platformer src/com/platformer/Main.java src/module-info.java
+find src -name *.java > sources.txt
+
+javac -Xlint:all -Xlint:-serial -p lib --source-path src -d out/production/platformer @sources.txt
 jar -c -f out/artifacts/platformer_jar/platformer.jar -e com.platformer.Main -C . res -C out/production/platformer .
 
 if [ -z ${1+x} ];then

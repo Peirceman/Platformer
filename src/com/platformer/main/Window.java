@@ -68,17 +68,25 @@ public class Window extends JFrame{
 		else if (location.contains("bottom"))
 			this.setLocation(this.getX(), defaultD.height - this.getHeight() - 35);
 
+
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowActivated(WindowEvent e) {
-				if (panel instanceof Game g)
+				if (panel instanceof Game g) {
 					g.resetPlayerSpeed();
+				}
 			}
 
 			@Override
 			public void windowDeactivated(WindowEvent e) {
-				if (panel instanceof Game g)
+				if (panel instanceof Game g) {
 					g.clearPlayerSpeed();
+				}
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				System.out.println();
 			}
 		});
 		this.setVisible(true);
@@ -89,7 +97,6 @@ public class Window extends JFrame{
 	@Override
 	public void dispose() {
 		super.dispose();
-		System.out.println("dispoes")
 		try {
 			socket.close();
 		} catch (IOException ignored) {}
